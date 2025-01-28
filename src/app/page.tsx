@@ -11,6 +11,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
 import { ChevronDown } from 'lucide-react';
+import { ImportDialog } from '@/components/ImportDialog';
 
 const steps = [
   { title: 'Document Details', component: TitleStep },
@@ -70,6 +71,8 @@ export default function Home() {
                   </ol>
                 </CollapsibleContent>
               </Collapsible>
+
+              <ImportDialog />
 
               <Progress value={(currentStep + 1) * 33} className="h-2" />
               <p className="text-sm text-muted-foreground">

@@ -28,6 +28,7 @@ type DocumentStore = {
   setVersion: (index: number) => void;
   reset: () => void;
   loadSavedDocument: (doc: { title: string; description: string; content: string }) => void;
+  setStep: (step: number) => void;
 };
 
 export const useDocumentStore = create<DocumentStore>()(
@@ -106,6 +107,7 @@ export const useDocumentStore = create<DocumentStore>()(
         }],
         currentVersionIndex: 0
       })),
+      setStep: (step) => set({ currentStep: step }),
     }),
     {
       name: 'document-storage',
