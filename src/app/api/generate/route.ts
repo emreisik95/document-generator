@@ -40,21 +40,48 @@ Example structure:
 
 Overview text
 
-## Acceptance Criteria
+# Logs Management in Athena, CloudWatch, and S3
 
-| ID | Description | Expected Outcome |
-|----|-------------|------------------|
-| AC1 | ... | ... |
+This documentation outlines the types of logs stored in Amazon Athena, Amazon CloudWatch, and Amazon S3 for various services including web pixel, webhook, historical user sync, IYS (İletişim Yönetim Sistemi) logs, system logs, and catalog sync logs.
 
-## Test Cases
+## Logs Stored in Athena
+The following logs are stored in Amazon Athena:
 
-| ID | Description | Steps | Expected Result |
-|----|-------------|-------|-----------------|
-| TC1 | ... | ... | ... |
+- **Web Pixel Logs**: These logs capture data about user interactions through web pixels, allowing for detailed analysis of user engagement.
+- **Webhook Logs**: Logs generated from webhook calls that provide insights into the events triggered by external systems.
+- **Historical User Sync Logs**: These logs maintain records of user synchronization activities over time, which is essential for auditing and troubleshooting purposes.
+- **IYS (İletişim Yönetim Sistemi) Logs**: Logs generated from the Integrated Yield System (IYS), which includes detailed records of system activities and transactions.
 
-## Implementation Notes
-- Note 1
-- Note 2`
+## Logs Stored in CloudWatch
+The following logs are stored in Amazon CloudWatch:
+
+- **Old IYS Logs**: Legacy logs from the Integrated Yield System (İletişim Yönetim Sistemi) that provide historical data for analysis and compliance purposes.
+- **System Logs**: Logs that capture system-level events and metrics, crucial for monitoring the health and performance of applications.
+
+## Logs Stored in S3
+The following logs are stored in Amazon S3:
+
+- **Catalog Sync Logs**: These logs track synchronization activities of the catalog, including updates, deletions, and additions to the catalog items.
+
+## Troubleshooting
+### Unable to find logs in Athena
+Ensure that the correct database and table are selected in Athena. Verify the query syntax and check for any filters that may exclude the logs.
+
+### Old IYS logs not visible in CloudWatch
+Check the log retention settings in CloudWatch to ensure that the logs have not been deleted. Also, verify that the correct log group is being accessed.
+
+### Catalog sync logs not appearing in S3
+Confirm that the logs have been correctly configured to be written to S3. Check the permissions of the S3 bucket to ensure logs can be stored.
+
+## Troubleshooting
+### Unable to find logs in Athena
+Ensure that the correct database and table are selected in Athena. Verify the query syntax and check for any filters that may exclude the logs.
+
+### Old IYS logs not visible in CloudWatch
+Check the log retention settings in CloudWatch to ensure that the logs have not been deleted. Also, verify that the correct log group is being accessed.
+
+### Catalog sync logs not appearing in S3
+Confirm that the logs have been correctly configured to be written to S3. Check the permissions of the S3 bucket to ensure logs can be stored.`
         },
         ...messages
       ],
