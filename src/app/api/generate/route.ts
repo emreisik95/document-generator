@@ -1,15 +1,26 @@
 import OpenAI from 'openai';
 
+if (!process.env.OPENAI_API_KEY) {
+  throw new Error('Missing OPENAI_API_KEY environment variable');
+}
+
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY.trim(),
 });
 
 export async function POST(req: Request) {
-  const { messages } = await req.json();
-
   try {
+    const { messages } = await req.json();
+
+    if (!messages || !Array.isArray(messages)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid request: messages array is required' }), 
+        { status: 400 }
+      );
+    }
+
     const completion = await openai.chat.completions.create({
-      model: process.env.NEXT_PUBLIC_OPENAI_MODEL || 'gpt-4o-mini',
+      model: process.env.NEXT_PUBLIC_OPENAI_MODEL || 'gpt-4',
       messages: [
         {
           role: 'system',
@@ -29,48 +40,21 @@ Example structure:
 
 Overview text
 
-# Logs Management in Athena, CloudWatch, and S3
+## Acceptance Criteria
 
-This documentation outlines the types of logs stored in Amazon Athena, Amazon CloudWatch, and Amazon S3 for various services including web pixel, webhook, historical user sync, IYS (İletişim Yönetim Sistemi) logs, system logs, and catalog sync logs.
+| ID | Description | Expected Outcome |
+|----|-------------|------------------|
+| AC1 | ... | ... |
 
-## Logs Stored in Athena
-The following logs are stored in Amazon Athena:
+## Test Cases
 
-- **Web Pixel Logs**: These logs capture data about user interactions through web pixels, allowing for detailed analysis of user engagement.
-- **Webhook Logs**: Logs generated from webhook calls that provide insights into the events triggered by external systems.
-- **Historical User Sync Logs**: These logs maintain records of user synchronization activities over time, which is essential for auditing and troubleshooting purposes.
-- **IYS (İletişim Yönetim Sistemi) Logs**: Logs generated from the Integrated Yield System (IYS), which includes detailed records of system activities and transactions.
+| ID | Description | Steps | Expected Result |
+|----|-------------|-------|-----------------|
+| TC1 | ... | ... | ... |
 
-## Logs Stored in CloudWatch
-The following logs are stored in Amazon CloudWatch:
-
-- **Old IYS Logs**: Legacy logs from the Integrated Yield System (İletişim Yönetim Sistemi) that provide historical data for analysis and compliance purposes.
-- **System Logs**: Logs that capture system-level events and metrics, crucial for monitoring the health and performance of applications.
-
-## Logs Stored in S3
-The following logs are stored in Amazon S3:
-
-- **Catalog Sync Logs**: These logs track synchronization activities of the catalog, including updates, deletions, and additions to the catalog items.
-
-## Troubleshooting
-### Unable to find logs in Athena
-Ensure that the correct database and table are selected in Athena. Verify the query syntax and check for any filters that may exclude the logs.
-
-### Old IYS logs not visible in CloudWatch
-Check the log retention settings in CloudWatch to ensure that the logs have not been deleted. Also, verify that the correct log group is being accessed.
-
-### Catalog sync logs not appearing in S3
-Confirm that the logs have been correctly configured to be written to S3. Check the permissions of the S3 bucket to ensure logs can be stored.
-
-## Troubleshooting
-### Unable to find logs in Athena
-Ensure that the correct database and table are selected in Athena. Verify the query syntax and check for any filters that may exclude the logs.
-
-### Old IYS logs not visible in CloudWatch
-Check the log retention settings in CloudWatch to ensure that the logs have not been deleted. Also, verify that the correct log group is being accessed.
-
-### Catalog sync logs not appearing in S3
-Confirm that the logs have been correctly configured to be written to S3. Check the permissions of the S3 bucket to ensure logs can be stored.`
+## Implementation Notes
+- Note 1
+- Note 2`
         },
         ...messages
       ],
@@ -96,18 +80,34 @@ Confirm that the logs have been correctly configured to be written to S3. Check 
     });
   } catch (error) {
     console.error('Error in generate route:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Failed to generate documentation';
+    
+    // Handle specific error types
+    if (error instanceof Error) {
+      if (error.message.includes('API key')) {
+        return new Response(
+          JSON.stringify({ 
+            error: 'OpenAI API key configuration error',
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined
+          }), 
+          { status: 500 }
+        );
+      }
+      
+      if (error.message.includes('Rate limit')) {
+        return new Response(
+          JSON.stringify({ error: 'Rate limit exceeded. Please try again later.' }), 
+          { status: 429 }
+        );
+      }
+    }
+
+    // Generic error response
     return new Response(
       JSON.stringify({ 
-        error: errorMessage,
-        details: error instanceof Error ? error.stack : undefined
+        error: 'Failed to generate documentation',
+        details: process.env.NODE_ENV === 'development' ? error instanceof Error ? error.message : 'Unknown error' : undefined
       }), 
-      {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
+      { status: 500 }
     );
   }
 }
