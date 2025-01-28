@@ -116,7 +116,7 @@ export function ImportDialog() {
       <Dialog open={showImportDialog} onOpenChange={setShowImportDialog}>
         <DialogTrigger asChild>
           <Button variant="secondary" size="lg">
-            Use Existing Documentation
+            Start With Existing Documentation
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-2xl">

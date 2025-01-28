@@ -39,7 +39,6 @@ export default function Home() {
           <div className="max-w-3xl mx-auto">
             <div className="mb-8 space-y-4">
               <h1 className="text-2xl font-bold">Confluence Documentation Generator</h1>
-              
               <Collapsible>
                 <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg bg-muted/50 p-4 font-semibold hover:bg-muted/70">
                   <span>How It Works</span>
@@ -72,13 +71,13 @@ export default function Home() {
                 </CollapsibleContent>
               </Collapsible>
 
-              <ImportDialog />
-
               <Progress value={(currentStep + 1) * 33} className="h-2" />
               <p className="text-sm text-muted-foreground">
                 Step {currentStep + 1} of {steps.length}
               </p>
             </div>
+            
+            {currentStep === 0 && <ImportDialog />}
             
             <div className="bg-background p-6 rounded-lg shadow">
               <CurrentStepComponent />
