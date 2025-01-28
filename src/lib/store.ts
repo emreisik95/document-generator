@@ -27,6 +27,7 @@ type DocumentStore = {
   addVersion: (content: string, feedback?: string) => void;
   setVersion: (index: number) => void;
   reset: () => void;
+  loadSavedDocument: (doc: { title: string; description: string; content: string }) => void;
 };
 
 export const useDocumentStore = create<DocumentStore>()(
@@ -39,25 +40,26 @@ export const useDocumentStore = create<DocumentStore>()(
       generatedContent: '',
       currentStep: 0,
       versions: [],
-      currentVersionIndex: -1,
+      currentVersionIndex: 0,
       setTitle: (title) => set({ title }),
       setDescription: (description) => set({ description }),
       setAcceptanceCriteria: (acceptanceCriteria) => set({ acceptanceCriteria }),
       setTestCases: (testCases) => set({ testCases }),
       setGeneratedContent: (content, feedback) => 
-        set((state) => {
-          const newVersion = {
-            content,
-            timestamp: Date.now(),
-            version: state.versions.length + 1,
-            feedback
-          };
-          return {
-            generatedContent: content,
-            versions: [...state.versions, newVersion],
-            currentVersionIndex: state.versions.length
-          };
-        }),
+        set((state) => ({
+          generatedContent: content,
+          versions: feedback 
+            ? [...state.versions, { 
+                version: state.versions.length + 1, 
+                content, 
+                feedback, 
+                timestamp: Date.now() 
+              }]
+            : state.versions,
+          currentVersionIndex: feedback 
+            ? state.versions.length 
+            : state.currentVersionIndex
+        })),
       nextStep: () => set((state) => ({ currentStep: state.currentStep + 1 })),
       prevStep: () => set((state) => ({ currentStep: state.currentStep - 1 })),
       addVersion: (content, feedback) => 
@@ -89,9 +91,21 @@ export const useDocumentStore = create<DocumentStore>()(
           generatedContent: '',
           currentStep: 0,
           versions: [],
-          currentVersionIndex: -1
+          currentVersionIndex: 0
         }));
-      }
+      },
+      loadSavedDocument: (doc) => set(() => ({
+        currentStep: 2, // Go directly to GenerateStep
+        title: doc.title,
+        description: doc.description,
+        generatedContent: doc.content,
+        versions: [{
+          version: 1,
+          content: doc.content,
+          timestamp: Date.now()
+        }],
+        currentVersionIndex: 0
+      })),
     }),
     {
       name: 'document-storage',

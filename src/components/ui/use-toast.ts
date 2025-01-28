@@ -16,11 +16,12 @@ interface BaseToast {
   onDismiss?: (toast: ToasterToast) => void
   onRemove?: (toast: ToasterToast) => void
   duration?: number
+  onOpenChange?: (open: boolean) => void
 }
 
 interface ToasterToast extends BaseToast {
   id: string
-  dismissible?: boolean
+  open?: boolean
 }
 
 type ToastProps = Omit<BaseToast, "id">
@@ -98,7 +99,7 @@ export const reducer = (state: State, action: Action): State => {
           t.id === toastId || toastId === undefined
             ? {
                 ...t,
-                dismissible: true,
+                open: false,
               }
             : t
         ),
@@ -145,7 +146,10 @@ function toast(props: ToastProps) {
     toast: {
       ...props,
       id,
-      dismissible: false,
+      open: true,
+      onOpenChange: (open: boolean) => {
+        if (!open) dismiss()
+      },
     },
   })
 

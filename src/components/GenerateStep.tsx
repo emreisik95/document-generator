@@ -35,7 +35,7 @@ const markdownComponents = {
     <p className="my-2" {...props}>{children}</p>
   ),
   table: ({ children, ...props }: TableProps) => (
-    <div className="my-4 overflow-x-auto">
+    <div className="overflow-x-auto">
       <table className="min-w-full border-collapse bg-card text-sm" {...props}>
         {children}
       </table>
@@ -52,7 +52,7 @@ const markdownComponents = {
     </td>
   ),
   pre: ({ children, ...props }: MarkdownProps) => (
-    <pre className="my-1 p-3 rounded-lg overflow-x-auto bg-gray-800 text-gray-100" {...props}>
+    <pre className="my-1 p-3 rounded-lg overflow-x-auto bg-gray-800 text-gray-100 dark:bg-gray-800 dark:text-gray-100" {...props}>
       {children}
     </pre>
   ),
@@ -62,8 +62,8 @@ const markdownComponents = {
       <code
         className={`${className || ''} ${
           isInlineCode 
-            ? 'px-1 py-0.5 rounded font-mono text-sm bg-gray-800 text-gray-100'
-            : 'block bg-gray-800 text-gray-100'
+            ? 'px-1 py-0.5 rounded font-mono text-sm bg-gray-800 text-gray-100 dark:bg-gray-800 dark:text-gray-100'
+            : 'block bg-gray-800 text-gray-100 dark:bg-gray-800 dark:text-gray-100'
         }`}
         {...props}
       >
@@ -177,11 +177,22 @@ export default function GenerateStep() {
     }
   };
 
-  const handleContinue = () => {
-    addVersion(generatedContent);
+
+  const handleSave = () => {
+    const savedDocs = JSON.parse(localStorage.getItem('savedDocuments') || '[]');
+    const newDoc = {
+      id: crypto.randomUUID(),
+      title,
+      description,
+      content: generatedContent,
+      timestamp: new Date().toISOString(),
+    };
+    savedDocs.push(newDoc);
+    localStorage.setItem('savedDocuments', JSON.stringify(savedDocs));
     toast({
-      title: "Documentation Complete",
-      description: "Your documentation has been generated and saved.",
+      title: "Documentation Saved",
+      description: "Your documentation has been saved to local storage.",
+      duration: 3000,
     });
   };
 
@@ -233,6 +244,9 @@ export default function GenerateStep() {
         <div className="flex gap-2">
           <Button variant="outline" onClick={handleStartOver}>
             Start Over
+          </Button>
+          <Button variant="secondary" onClick={handleSave}>
+            Save
           </Button>
           <Button onClick={handleCopyToClipboard}>
             Copy to Clipboard
@@ -311,17 +325,12 @@ export default function GenerateStep() {
           style={{ 
             backgroundColor: 'transparent',
             color: 'inherit',
-            whiteSpace: 'pre-wrap'
+            fontFamily: 'inherit'
           }}
           components={markdownComponents}
         />
       </div>
-      
-      <div className="flex justify-end">
-        <Button onClick={handleContinue} className="w-32">
-          Continue
-        </Button>
-      </div>
+    
       
       <form onSubmit={handleRegenerateWithFeedback} className="space-y-4">
         <div>
