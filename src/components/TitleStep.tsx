@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useDocumentStore } from '@/lib/store';
-import { ImportDialog } from './ImportDialog';
 
 export default function TitleStep() {
   const { title, description, setTitle, setDescription, nextStep } = useDocumentStore();
@@ -15,8 +14,6 @@ export default function TitleStep() {
 
   return (
     <div className="space-y-6">
-              <ImportDialog />
-
       <div>
         <label className="block text-sm font-medium mb-2">Document Title</label>
         <Input
